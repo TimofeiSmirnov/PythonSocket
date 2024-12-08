@@ -7,6 +7,7 @@ import requests
 from config import host, port, max_col_of_clients, HDRS, APPID, URL_BASE
 
 
+# Создание объекта сервера и запуск цикла ожидания подключения и запроса от клиента
 async def creating_server_and_start():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
@@ -19,26 +20,28 @@ async def creating_server_and_start():
         client, address = await loop.sock_accept(server_socket)
         loop.create_task(getting_request(client, address))
 
+
+# Асинхронная обработка запроса от клиента
 async def getting_request(client, address):
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Client with address: ", address, " has been connected.")
 
     try:
+        # Асинхронно получаем данные от подключившегося клиента
         data_new = (await loop.sock_recv(client, 1024)).decode('utf8')
         data = data_new.split(' ')[1]
         print("His data: ", data, "")
         if data:
+            # Асинхронно отправляем данные подключившемуся клиенту
             await sending_data(data, client, address, current_time)
-            if data == "/all":
-                print("A list of our photos has been sent to client: ", address, ".\n")
-            else:
-                print("Photo ", data, " has been sent to client: ", address, ".\n")
+            print("File ", data, " has been sent to client: ", address, ".\n")
     except Exception as e:
         print("Error: ", e)
     finally:
         client.close()
 
 
+# Для отправки данных мы просто подыскиваем необходимый файл на сервере, кодируем его в байты и отправляем
 async def sending_data(data, client, address, c_time):
     try:
         folders = {
@@ -54,6 +57,7 @@ async def sending_data(data, client, address, c_time):
                 folders[folder] = True
                 break
 
+        # Шаримся по всем файлам и отправляем необходимый
         if folders["sitepatterns"]:
             with open(f'sitepatterns{data}', 'rb') as file:
                 response = HDRS.encode('utf-8') + file.read()
@@ -127,6 +131,7 @@ def weather(data):
     return response
 
 
+# Функция выводит все файлы, которые есть на сервере
 def generate_all_response():
     response = ""
     for folder in ["photos", "sitepatterns", "music", "video"]:
@@ -138,10 +143,12 @@ def generate_all_response():
     return response
 
 
+# Получаем данные о погоде по API
 def current_weather(q, appid=APPID):
     return requests.get(URL_BASE + "weather", params={"q": q, "appid": appid}).json()
 
 
+# Даннаая функция записывает в файл list.txt логи о подключающихся клиентах
 def time_writing(time, address, data):
     with open('list.txt', 'a') as file:
         log = f"Time: {time} | Address: {address} | Data: {data}\n"
