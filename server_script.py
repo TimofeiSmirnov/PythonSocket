@@ -123,11 +123,6 @@ def weather(data):
             f"</ul>"
             f'<a href="all">Нажмите сюда, чтобы вернуться в хранилище файлов.</a>'
         )
-    elif type_of == '/forecast':
-        response = (
-            "<h2>Forecast</h2>"
-            "<p>Sorry, forecast functionality will be implemented later.</p>"
-        )
     return response
 
 
