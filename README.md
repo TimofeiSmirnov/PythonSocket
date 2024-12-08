@@ -16,3 +16,5 @@
 2. Запустите сервер:
    ```bash
    python server_script.py
+
+Для связи пишите мне в тг: @TimofeiSmirnov1
