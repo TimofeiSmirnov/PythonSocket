@@ -15,4 +15,4 @@
 1. Перейдите в директорию с проектом.
 2. Запустите сервер:
    ```bash
-   python your_script_name.py
+   python server_script.py
